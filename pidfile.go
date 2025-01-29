@@ -11,6 +11,8 @@ import (
 
 // Pidfile represents the name
 type Pidfile struct {
+	Signal   syscall.Signal
+	AppId    string
 	FullPath string
 	FirstPid int
 	OnSecond func()
@@ -18,7 +20,7 @@ type Pidfile struct {
 
 // New creates a Pidfile instance based on the application ID
 func New(appId string) *Pidfile {
-	return &Pidfile{FullPath: fullPath(appId)}
+	return &Pidfile{Signal: syscall.SIGUSR1, AppId: appId, FullPath: fullPath(appId)}
 }
 
 // fullPath returns an absolute filename, appropriate for the operating system
@@ -50,7 +52,7 @@ func (pf *Pidfile) Create() error {
 	if pf.OnSecond != nil {
 		go func() {
 			c := make(chan os.Signal, 1)
-			signal.Notify(c, syscall.SIGUSR1)
+			signal.Notify(c, pf.Signal)
 			for {
 				<-c
 				pf.OnSecond()
