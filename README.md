@@ -53,6 +53,8 @@ func main() {
 
 ```
 
+NB: This package was built for usage in a [Fyne](https://fyne.io/) project.
+
 ## Credits / related work
 
 - https://github.com/postfinance/single
