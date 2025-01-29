@@ -9,18 +9,18 @@ import (
 
 func main() {
 
-	// create PID file struct based on identifier
+	// create pidfile struct based on identifier
 	pf := pidfile.New("app_identifier")
 	// when a second instance is started
 	pf.OnSecond = func() {
 		log.Println("another instance was started")
 	}
-	// create PID file on application start
+	// create pidfile on application start
 	err := pf.Create()
 	if err != nil {
 		log.Fatalf("can't create pidfile: %v", err)
 	}
-	// remove PID file on application close
+	// remove pidfile on application close
 	defer pf.Remove()
 	// if this is not the first instance, then close it
 	if pf.FirstPid != os.Getpid() {
