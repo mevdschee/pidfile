@@ -1,4 +1,4 @@
-package Pidfile
+package pidfile
 
 import (
 	"fmt"
