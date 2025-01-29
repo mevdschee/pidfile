@@ -3,6 +3,7 @@ package pidfile
 import (
 	"fmt"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"strconv"
 	"syscall"
@@ -12,6 +13,7 @@ import (
 type Pidfile struct {
 	FullPath string
 	FirstPid int
+	OnSecond func()
 }
 
 // New creates a Pidfile instance based on the application ID
@@ -24,26 +26,37 @@ func fullPath(appId string) string {
 	return filepath.Join(os.TempDir(), fmt.Sprintf("%s.pid", appId))
 }
 
-func processExists(pid int) bool {
+func findProcess(pid int) *os.Process {
 	process, err := os.FindProcess(pid)
 	if err != nil {
-		return false
+		return nil
 	}
 	err = process.Signal(syscall.Signal(0))
 	if err == syscall.ESRCH {
 		// The process does not exist
-		return false
+		return nil
 	}
 	if err != nil {
 		// Some other unexpected error
-		return false
+		return nil
 	}
 	// The process exists and is active
-	return true
+	return process
 }
 
 // Create creates a pidfile
 func (pf *Pidfile) Create() error {
+	// if OnSecond is set, listen for SIGUSR1 and call it
+	if pf.OnSecond != nil {
+		go func() {
+			c := make(chan os.Signal, 1)
+			signal.Notify(c, syscall.SIGUSR1)
+			for {
+				<-c
+				pf.OnSecond()
+			}
+		}()
+	}
 	// check if the file exists
 	pf.FirstPid = os.Getpid()
 	pids, err := os.ReadFile(pf.FullPath)
@@ -57,8 +70,12 @@ func (pf *Pidfile) Create() error {
 	if err != nil {
 		return err
 	}
-	if processExists(pid) {
+	process := findProcess(pid)
+	if process != nil {
 		pf.FirstPid = pid
+		if pf.OnSecond != nil {
+			process.Signal(syscall.SIGUSR1)
+		}
 		return nil
 	}
 	err = os.Remove(pf.FullPath)
