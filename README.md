@@ -16,7 +16,7 @@ To install the `pidfile` package, use the following `go get` command:
 
 ## Example
 
-Here is a full example of an application that uses the pidfile package to ensure single instance execution
+Here is an example of an application that uses the pidfile package to ensure single instance execution:
 
 ```go
 package main
