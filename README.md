@@ -53,7 +53,7 @@ func main() {
 
 ```
 
-NB: This package was built for usage in a [Fyne](https://fyne.io/) project.
+NB: This package was built for usage in a (desktop) [Fyne](https://fyne.io/) project.
 
 ## Credits / related work
 
