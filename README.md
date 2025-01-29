@@ -32,6 +32,10 @@ func main() {
 
     // create PID file struct based on identifier
     pf := pidfile.New("app_identifier")
+    // when a second instance is started
+    pf.OnSecond = func() {
+		log.Println("another instance was started")
+	}
     // create PID file on application start
     err := pf.Create();
     if err != nil {
