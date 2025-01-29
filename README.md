@@ -39,7 +39,7 @@ func main() {
 	// create PID file on application start
 	err := pf.Create()
 	if err != nil {
-		log.Fatalf("can't create PID file: %v", err)
+		log.Fatalf("can't create pidfile: %v", err)
 	}
 	// remove PID file on application close
 	defer pf.Remove()
