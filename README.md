@@ -22,10 +22,10 @@ Here is a full example of an application that uses the pidfile package to ensure
 package main
 
 import (
-    "fmt"
-    "log"
-    "os"
-    "github.com/mevdschee/pidfile"
+	"log"
+	"os"
+
+	"github.com/mevdschee/pidfile"
 )
 
 func main() {
