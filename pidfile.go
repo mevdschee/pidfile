@@ -76,7 +76,7 @@ func (pf *Pidfile) Create() error {
 	if process != nil {
 		pf.FirstPid = pid
 		if pf.OnSecond != nil {
-			process.Signal(syscall.SIGUSR1)
+			process.Signal(pf.Signal)
 		}
 		return nil
 	}
