@@ -40,7 +40,7 @@ func main() {
     // remove PID file on application close
     defer pf.Remove();
     // if this is not the first instance, then close it
-    if pf.FirstPid() != os.Getpid() {
+    if pf.FirstPid != os.Getpid() {
         return
     } 
     
