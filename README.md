@@ -33,14 +33,14 @@ func main() {
     // create PID file struct based on identifier
     pf := pidfile.New("app_identifier")
     // create PID file on application start
-    first, err := pf.Create();
+    err := pf.Create();
     if err != nil {
-        log.Fatalf("can't open PID file: %v", err)
+        log.Fatalf("can't create PID file: %v", err)
     }
     // remove PID file on application close
     defer pf.Remove();
     // if this is not the first instance, then close it
-    if !first {
+    if pf.FirstPid() != os.Getpid() {
         return
     } 
     
