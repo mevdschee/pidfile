@@ -53,7 +53,7 @@ func main() {
 
 ```
 
-### Credits / related work
+## Credits / related work
 
 - https://github.com/postfinance/single
 - https://github.com/makifdb/pidfile
