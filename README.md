@@ -1,6 +1,6 @@
 # Pidfile package for Go
 
-The `pidfile` package provides a simple way to ensure that only one instance of a Go application runs at any given time by using a file that contains the PID (a process identifier, an integer).
+The `pidfile` package provides a simple way to ensure that only one instance of a Go application runs at any given time by using a file that contains the PID (a process identifier, a number).
 
 ## Features
 
