@@ -7,6 +7,7 @@ The `pidfile` package provides a simple way to ensure that only one instance of 
 - Detects that the an instance of the application is already running.
 - Allows you to prevents multiple instances of the application from running concurrently.
 - Signals the first instance of the application when a next instance is started.
+- Passes the command line arguments of any next instance to the first instance.
 
 ## Installation
 
