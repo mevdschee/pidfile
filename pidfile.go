@@ -6,6 +6,7 @@ import (
 	"os/signal"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"syscall"
 )
 
@@ -15,7 +16,7 @@ type Pidfile struct {
 	AppId    string
 	FullPath string
 	FirstPid int
-	OnSecond func()
+	OnSecond func([]string)
 }
 
 // New creates a Pidfile instance based on the application ID
@@ -55,7 +56,9 @@ func (pf *Pidfile) Create() error {
 			signal.Notify(c, pf.Signal)
 			for {
 				<-c
-				pf.OnSecond()
+				args, _ := os.ReadFile(pf.FullPath + ".args")
+				os.Remove(pf.FullPath + ".args")
+				pf.OnSecond(strings.Split(string(args), "\b"))
 			}
 		}()
 	}
@@ -76,6 +79,7 @@ func (pf *Pidfile) Create() error {
 	if process != nil {
 		pf.FirstPid = pid
 		if pf.OnSecond != nil {
+			os.WriteFile(pf.FullPath+".args", []byte(strings.Join(os.Args, "\b")), 0644)
 			process.Signal(pf.Signal)
 		}
 		return nil
