@@ -81,12 +81,11 @@ func (pf *Pidfile) Create() error {
 		pf.FirstPid = pid
 		if pf.OnSecond != nil {
 			var file *os.File
-			for i := 0; i < 100; i++ {
-				file, err = os.OpenFile(pf.FullPath+".args.lock", os.O_RDWR|os.O_CREATE|os.O_EXCL, 0666)
+			for i := 0; i < 10; i++ {
+				file, err = os.OpenFile(pf.FullPath+".args.lock", os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0644)
 				if err == nil {
 					defer func() {
 						file.Close()
-						file.Sync()
 						os.Remove(pf.FullPath + ".args.lock")
 					}()
 					break
@@ -94,8 +93,9 @@ func (pf *Pidfile) Create() error {
 				time.Sleep(time.Millisecond * 100)
 			}
 			os.WriteFile(pf.FullPath+".args", []byte(strings.Join(os.Args, "\b")), 0644)
+			time.Sleep(time.Millisecond * 100)
 			process.Signal(pf.Signal)
-			for i := 0; i < 100; i++ {
+			for i := 0; i < 10; i++ {
 				_, err = os.ReadFile(pf.FullPath + ".args")
 				if os.IsNotExist(err) {
 					break
@@ -128,6 +128,10 @@ func (pf *Pidfile) Remove() error {
 	err = os.Remove(pf.FullPath)
 	if err != nil {
 		return err
+	}
+	if pf.OnSecond != nil {
+		os.Remove(pf.FullPath + ".args.lock")
+		os.Remove(pf.FullPath + ".args")
 	}
 	return nil
 }
