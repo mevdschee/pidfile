@@ -64,7 +64,7 @@ The following issues need addressing in future versions:
 
 ## Credits / related work
 
-The following packages have been inspired me to make this package:
+The following packages have inspired me to make this package:
 
 - https://github.com/postfinance/single
 - https://github.com/makifdb/pidfile
