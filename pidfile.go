@@ -84,7 +84,11 @@ func (pf *Pidfile) Create() error {
 			for i := 0; i < 100; i++ {
 				file, err = os.OpenFile(pf.FullPath+".args.lock", os.O_RDWR|os.O_CREATE|os.O_EXCL, 0666)
 				if err == nil {
-					defer file.Close()
+					defer func() {
+						file.Close()
+						file.Sync()
+						os.Remove(pf.FullPath + ".args.lock")
+					}()
 					break
 				}
 				time.Sleep(time.Millisecond * 100)
