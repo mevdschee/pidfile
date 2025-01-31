@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 	"syscall"
+	"time"
 )
 
 // Pidfile represents the name
@@ -79,8 +80,24 @@ func (pf *Pidfile) Create() error {
 	if process != nil {
 		pf.FirstPid = pid
 		if pf.OnSecond != nil {
+			var file *os.File
+			for i := 0; i < 100; i++ {
+				file, err = os.OpenFile(pf.FullPath+".args.lock", os.O_RDWR|os.O_CREATE|os.O_EXCL, 0666)
+				if err == nil {
+					defer file.Close()
+					break
+				}
+				time.Sleep(time.Millisecond * 100)
+			}
 			os.WriteFile(pf.FullPath+".args", []byte(strings.Join(os.Args, "\b")), 0644)
 			process.Signal(pf.Signal)
+			for i := 0; i < 100; i++ {
+				_, err = os.ReadFile(pf.FullPath + ".args")
+				if os.IsNotExist(err) {
+					break
+				}
+				time.Sleep(time.Millisecond * 100)
+			}
 		}
 		return nil
 	}

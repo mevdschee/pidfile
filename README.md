@@ -60,7 +60,8 @@ NB: This package was built for usage in a (desktop) [Fyne](https://fyne.io/) pro
 
 The following issues need addressing in future versions:
 
-- Race conditions on quick launching of multiple instances.
+- Add parallel tests to validate starting once does not have race conditions
+- Add parallel tests to validate arguments lock prevents race conditions
 
 ## Credits / related work
 
