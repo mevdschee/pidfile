@@ -56,7 +56,15 @@ func main() {
 
 NB: This package was built for usage in a (desktop) [Fyne](https://fyne.io/) project.
 
+## Future work / Known issues
+
+The following issues need addressing in future versions:
+
+- Race conditions on quick launching of multiple instances.
+
 ## Credits / related work
+
+The following packages have been inspired me to make this package:
 
 - https://github.com/postfinance/single
 - https://github.com/makifdb/pidfile
