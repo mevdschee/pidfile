@@ -67,11 +67,12 @@ func (pf *Pidfile) Create() error {
 	pf.FirstPid = os.Getpid()
 	pid := os.Getpid()
 	pids := fmt.Sprint(pid)
-	f, err := os.OpenFile(pf.FullPath, os.O_RDWR|os.O_APPEND|os.O_CREATE|os.O_EXCL, 0644)
+	f, err := os.OpenFile(pf.FullPath, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0644)
 	if err == nil {
 		f.WriteString(pids)
 		f.Sync()
 		f.Close()
+		return nil
 	} else if os.IsExist(err) {
 		time.Sleep(time.Millisecond * 100)
 		pidb, err := os.ReadFile(pf.FullPath)
