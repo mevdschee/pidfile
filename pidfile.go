@@ -73,18 +73,18 @@ func (pf *Pidfile) Create() error {
 		f.Sync()
 		f.Close()
 		return nil
-	} else if os.IsExist(err) {
-		time.Sleep(time.Millisecond * 100)
-		pidb, err := os.ReadFile(pf.FullPath)
-		if err != nil {
-			return err
-		}
-		pids = string(pidb)
-		pid, err = strconv.Atoi(pids)
-		if err != nil {
-			return err
-		}
-	} else {
+	}
+	if !os.IsExist(err) {
+		return err
+	}
+	time.Sleep(time.Millisecond * 100)
+	pidb, err := os.ReadFile(pf.FullPath)
+	if err != nil {
+		return err
+	}
+	pids = string(pidb)
+	pid, err = strconv.Atoi(pids)
+	if err != nil {
 		return err
 	}
 	process := findProcess(pid)
