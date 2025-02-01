@@ -65,15 +65,25 @@ func (pf *Pidfile) Create() error {
 	}
 	// check if the file exists
 	pf.FirstPid = os.Getpid()
-	pids, err := os.ReadFile(pf.FullPath)
-	if os.IsNotExist(err) {
-		return os.WriteFile(pf.FullPath, []byte(fmt.Sprint(os.Getpid())), 0644)
-	}
-	if err != nil {
-		return err
-	}
-	pid, err := strconv.Atoi(string(pids))
-	if err != nil {
+	pid := os.Getpid()
+	pids := fmt.Sprint(pid)
+	f, err := os.OpenFile(pf.FullPath, os.O_RDWR|os.O_APPEND|os.O_CREATE|os.O_EXCL, 0644)
+	if err == nil {
+		f.WriteString(pids)
+		f.Sync()
+		f.Close()
+	} else if os.IsExist(err) {
+		time.Sleep(time.Millisecond * 100)
+		pidb, err := os.ReadFile(pf.FullPath)
+		if err != nil {
+			return err
+		}
+		pids = string(pidb)
+		pid, err = strconv.Atoi(pids)
+		if err != nil {
+			return err
+		}
+	} else {
 		return err
 	}
 	process := findProcess(pid)
@@ -96,11 +106,10 @@ func (pf *Pidfile) Create() error {
 			time.Sleep(time.Millisecond * 100)
 			process.Signal(pf.Signal)
 			for i := 0; i < 10; i++ {
-				_, err = os.ReadFile(pf.FullPath + ".args")
+				_, err = os.Stat(pf.FullPath + ".args")
 				if os.IsNotExist(err) {
 					break
 				}
-				time.Sleep(time.Millisecond * 100)
 			}
 		}
 		return nil
