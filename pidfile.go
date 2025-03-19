@@ -1,6 +1,7 @@
 package pidfile
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"os/signal"
@@ -22,7 +23,7 @@ type Pidfile struct {
 
 // New creates a Pidfile instance based on the application ID
 func New(appId string) *Pidfile {
-	return &Pidfile{Signal: syscall.SIGUSR1, AppId: appId, FullPath: fullPath(appId)}
+	return &Pidfile{Signal: syscall.SIGTERM, AppId: appId, FullPath: fullPath(appId)}
 }
 
 // fullPath returns an absolute filename, appropriate for the operating system
@@ -50,13 +51,17 @@ func findProcess(pid int) *os.Process {
 
 // Create creates a pidfile
 func (pf *Pidfile) Create() error {
-	// if OnSecond is set, listen for SIGUSR1 and call it
+	// if OnSecond is set, listen for SIGTERM and call it
 	if pf.OnSecond != nil {
 		go func() {
 			c := make(chan os.Signal, 1)
 			signal.Notify(c, pf.Signal)
 			for {
 				<-c
+				_, err := os.Stat(pf.FullPath + ".args")
+				if errors.Is(err, os.ErrNotExist) {
+					os.Exit(1)
+				}
 				args, _ := os.ReadFile(pf.FullPath + ".args")
 				os.Remove(pf.FullPath + ".args")
 				pf.OnSecond(strings.Split(string(args), "\b"))
